@@ -1,26 +1,26 @@
-import "./TripDetails.css";
-import { useEffect, useState } from "react";
+import './TripDetails.css';
+import { useEffect, useState } from 'react';
 
 // TODO: abstract a service switcher
-import { service } from "../../services/hardcoded";
-import type { Expense, Settle, Trip } from "../../types";
-import { PersonOwed } from "./components/PersonOwed.tsx";
+import { service } from '../../services/hardcoded';
+import type { Expense, Settle, Trip } from '../../types';
+import { PersonOwed } from './components/PersonOwed.tsx';
 
-const USDollar = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
+const USDollar = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD'
 });
 
 // currency formatter
-function centsToDollarsFmt(cents: number) {
+function centsToDollarsFmt (cents: number) {
   return USDollar.format(cents / 100);
 }
 
 type TripDetailsProps = {
-  tripId: string;
+  tripId: string
 };
 
-export function TripDetails({ tripId }: TripDetailsProps) {
+export function TripDetails ({ tripId }: TripDetailsProps) {
   // TODO: move the fetch functionality into the hardcoded service
   const [trip, setTrip] = useState<Trip | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -31,13 +31,13 @@ export function TripDetails({ tripId }: TripDetailsProps) {
     service.fetchTrip(tripId).then((foundTrip) => {
       if (!foundTrip) {
         // TODO: handle this better?
-        throw new Error("Trip not found!");
+        throw new Error('Trip not found!');
       }
 
       setTrip(foundTrip);
     });
-    service.fetchExpenses(tripId).then((result) => setExpenses(result));
-    service.fetchSettles(tripId).then((result) => setSettles(result));
+    service.fetchExpenses(tripId).then((result) => { setExpenses(result); });
+    service.fetchSettles(tripId).then((result) => { setSettles(result); });
   }, []);
 
   // TODO: handle loading better
@@ -46,17 +46,17 @@ export function TripDetails({ tripId }: TripDetailsProps) {
   }
 
   const attendingList = trip.inviteGroup.invites.filter(
-    ({ attending }) => attending,
+    ({ attending }) => attending
   );
 
   if (!attendingList || attendingList.length === 0) {
     // TODO: handle this better?
-    throw new Error("Invite group not found!");
+    throw new Error('Invite group not found!');
   }
 
   // calculate who spent money and how much everyone owes
-  const spent: { [index: string]: number } = {};
-  const totalLiable: { [index: string]: number } = {};
+  const spent: Record<string, number> = {};
+  const totalLiable: Record<string, number> = {};
 
   expenses.forEach(({ payer, amount: amountString, splitGroupId }) => {
     const payerPreviousSpent = spent[payer.personId] || 0;
@@ -66,10 +66,10 @@ export function TripDetails({ tripId }: TripDetailsProps) {
     spent[payer.personId] = payerPreviousSpent + amount;
 
     // by default, split on everyone going on the trip
-    let splitGroup = attendingList;
+    const splitGroup = attendingList;
 
-    if (splitGroupId !== "") {
-      throw new Error("custom splits not implemented yet");
+    if (splitGroupId !== '') {
+      throw new Error('custom splits not implemented yet');
     }
 
     const costPerPerson = Math.round(amount / splitGroup.length);
@@ -97,7 +97,7 @@ export function TripDetails({ tripId }: TripDetailsProps) {
 
       if (!person) {
         // TODO: handle this better?
-        throw new Error("Person not found!");
+        throw new Error('Person not found!');
       }
 
       const netOwed =
@@ -106,7 +106,7 @@ export function TripDetails({ tripId }: TripDetailsProps) {
       return {
         id: person.personId,
         name: person.firstName,
-        amountOwed: netOwed,
+        amountOwed: netOwed
       };
     })
     .sort((a, b) => a.amountOwed - b.amountOwed);

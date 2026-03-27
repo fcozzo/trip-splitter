@@ -1,1 +1,1 @@
-export { TripDetails } from "./TripDetails.tsx";
+export { TripDetails } from './TripDetails.tsx';

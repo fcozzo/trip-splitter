@@ -1,26 +1,26 @@
-import styles from "./Trips.module.css";
-import { useEffect, useState } from "react";
-import type { Trip } from "../types";
-import { Card } from "../libs/ui/Card.tsx";
+import styles from './Trips.module.css';
+import { useEffect, useState } from 'react';
+import type { Trip } from '../types';
+import { Card } from '../libs/ui/Card.tsx';
 
-export function Trips() {
+export function Trips () {
   const [trips, setTrips] = useState<Trip[]>([]);
 
   // TODO: use tanstack query
   // TODO: use zod for response validation
   useEffect(() => {
-    fetch("http://localhost:3000/trip")
-      .then((resp) => resp.json())
-      .then((result) => setTrips(result));
+    fetch('http://localhost:3000/trip')
+      .then(async (resp) => await resp.json())
+      .then((result) => { setTrips(result); });
   }, []);
 
-  if (!trips.length) {
+  if (trips.length === 0) {
     return <h2>Loading</h2>;
   }
 
   const handleNewTripClick = () => {
     // TODO: modal for creating a new trip
-    alert("done");
+    alert('done');
   };
 
   const getTripUrl = (id: string) => `/trips/${encodeURIComponent(id)}`;

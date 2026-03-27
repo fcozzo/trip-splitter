@@ -32,7 +32,7 @@ const TripsTripIdRoute = TripsTripIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/trips/$tripId': typeof TripsTripIdRoute
-  '/trips': typeof TripsIndexRoute
+  '/trips/': typeof TripsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -47,7 +47,7 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/trips/$tripId' | '/trips'
+  fullPaths: '/' | '/trips/$tripId' | '/trips/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/trips/$tripId' | '/trips'
   id: '__root__' | '/' | '/trips/$tripId' | '/trips/'
@@ -71,7 +71,7 @@ declare module '@tanstack/react-router' {
     '/trips/': {
       id: '/trips/'
       path: '/trips'
-      fullPath: '/trips'
+      fullPath: '/trips/'
       preLoaderRoute: typeof TripsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

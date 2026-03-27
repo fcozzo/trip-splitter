@@ -1,6 +1,6 @@
-import "./Header.css";
+import './Header.css';
 
-export function Header() {
+export function Header () {
   return (
     <header className="header">
       <div>HEADER FOP</div>
