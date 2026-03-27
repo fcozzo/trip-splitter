@@ -28,17 +28,36 @@ export function TripDetails ({ tripId }: TripDetailsProps) {
 
   useEffect(() => {
     // TODO: handle catching of errors
-    service.fetchTrip(tripId).then((foundTrip) => {
-      if (!foundTrip) {
-        // TODO: handle this better?
-        throw new Error('Trip not found!');
-      }
+    service
+      .fetchTrip(tripId)
+      .then((foundTrip) => {
+        if (!foundTrip) {
+          // TODO: handle this better?
+          throw new Error('Trip not found!');
+        }
 
-      setTrip(foundTrip);
-    });
-    service.fetchExpenses(tripId).then((result) => { setExpenses(result); });
-    service.fetchSettles(tripId).then((result) => { setSettles(result); });
-  }, []);
+        setTrip(foundTrip);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    service
+      .fetchExpenses(tripId)
+      .then((result) => {
+        setExpenses(result);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    service
+      .fetchSettles(tripId)
+      .then((result) => {
+        setSettles(result);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, [tripId]);
 
   // TODO: handle loading better
   if (!trip) {

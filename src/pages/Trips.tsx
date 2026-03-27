@@ -11,7 +11,12 @@ export function Trips () {
   useEffect(() => {
     fetch('http://localhost:3000/trip')
       .then(async (resp) => await resp.json())
-      .then((result) => { setTrips(result); });
+      .then((result) => {
+        setTrips(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
 
   if (trips.length === 0) {
