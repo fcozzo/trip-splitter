@@ -8,6 +8,7 @@ import {
   Close,
 } from '@radix-ui/react-dialog';
 import styles from './CreateTripDialog.module.css';
+import { useCreateTrip } from './helpers';
 
 type CreateTripDialogProps = {
   open: boolean;
@@ -16,29 +17,28 @@ type CreateTripDialogProps = {
 
 export function CreateTripDialog({ open, onClose }: CreateTripDialogProps) {
   const [tripName, setTripName] = useState('');
+  const { mutate: createTrip } = useCreateTrip();
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      const result = await fetch('http://localhost:3000/trip', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: tripName }),
-      });
-
-      if (result.status !== 201) {
-        alert(`ERROR: ${result.status}`);
-      } else {
-        const response = await result.json();
-
-        console.log(response);
-        alert('SUCCESS!');
-      }
-
-      onClose();
+      createTrip(
+        { name: tripName },
+        {
+          onSuccess: () => {
+            alert('Successfully created trip');
+          },
+          onError: (e) => {
+            alert(`Error creating trip\n\n${e.toString()}`);
+          },
+          onSettled: () => {
+            onClose();
+          },
+        },
+      );
     },
-    [onClose, tripName],
+    [createTrip, onClose, tripName],
   );
 
   return (
