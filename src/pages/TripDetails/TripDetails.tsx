@@ -1,100 +1,73 @@
-import './TripDetails.css';
-import { useEffect, useState } from 'react';
+import { styles } from './TripDetails.module.css';
+import { useState } from 'react';
 
-// TODO: abstract a service switcher
-import { service } from '../../services/hardcoded';
 import type { Expense, Settle, Trip } from '../../types';
 import { PersonOwed } from './components/PersonOwed.tsx';
+import {
+  useFetchTrip,
+  useUpdateTrip,
+  useRemoveAttendeeFromTrip,
+  useAddAttendee,
+  useAddTransaction,
+  useRemoveTransaction,
+} from './helpers.ts';
+import { TripForm } from './components/TripForm.tsx';
+import { AttendeesList } from './components/AttendeesList/AttendeesList.tsx';
+import { AddAttendeeDialog } from './components/AddAttendeeDialog/AddAttendeeDialog.tsx';
+import { TransactionList } from './components/TransactionList';
 
 const USDollar = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: 'USD'
+  currency: 'USD',
 });
 
 // currency formatter
-function centsToDollarsFmt (cents: number) {
+function centsToDollarsFmt(cents: number) {
   return USDollar.format(cents / 100);
 }
 
 type TripDetailsProps = {
-  tripId: string
+  tripId: string;
 };
 
-export function TripDetails ({ tripId }: TripDetailsProps) {
+export function TripDetails({ tripId }: TripDetailsProps) {
   // TODO: move the fetch functionality into the hardcoded service
-  const [trip, setTrip] = useState<Trip | null>(null);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [settles, setSettles] = useState<Settle[]>([]);
+  const [showAddAttendeeDialog, setShowAddAttendeeDialog] = useState(false);
+  const { data: trip, isLoading } = useFetchTrip(tripId);
+  const { mutate: updateTrip } = useUpdateTrip();
+  const { mutate: removeAttendeeFromTrip } = useRemoveAttendeeFromTrip();
+  const { mutate: addAttendeeToTrip } = useAddAttendee();
+  const { mutate: addTransaction } = useAddTransaction();
+  const { mutate: removeTransaction } = useRemoveTransaction();
 
-  useEffect(() => {
-    // TODO: handle catching of errors
-    service
-      .fetchTrip(tripId)
-      .then((foundTrip) => {
-        if (!foundTrip) {
-          // TODO: handle this better?
-          throw new Error('Trip not found!');
-        }
-
-        setTrip(foundTrip);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-    service
-      .fetchExpenses(tripId)
-      .then((result) => {
-        setExpenses(result);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-    service
-      .fetchSettles(tripId)
-      .then((result) => {
-        setSettles(result);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }, [tripId]);
-
-  // TODO: handle loading better
-  if (!trip) {
-    return <h2>Loading</h2>;
+  if (isLoading) {
+    return <h2>Loading...</h2>;
   }
 
-  const attendingList = trip.inviteGroup.invites.filter(
-    ({ attending }) => attending
-  );
-
-  if (!attendingList || attendingList.length === 0) {
-    // TODO: handle this better?
-    throw new Error('Invite group not found!');
-  }
+  const attendingList = trip.attendees;
+  const expenses = trip.expenses;
 
   // calculate who spent money and how much everyone owes
   const spent: Record<string, number> = {};
   const totalLiable: Record<string, number> = {};
 
-  expenses.forEach(({ payer, amount: amountString, splitGroupId }) => {
-    const payerPreviousSpent = spent[payer.personId] || 0;
+  expenses.forEach(({ payer, amount, splitGroupId }) => {
+    const payerPreviousSpent = spent[payer.id] || 0;
 
-    const amount = Number(amountString);
+    spent[payer.id] = payerPreviousSpent + amount;
 
-    spent[payer.personId] = payerPreviousSpent + amount;
-
-    // by default, split on everyone going on the trip
+    // // by default, split on everyone going on the trip
     const splitGroup = attendingList;
 
-    if (splitGroupId !== '') {
-      throw new Error('custom splits not implemented yet');
-    }
+    // if (splitGroupId !== '') {
+    //   throw new Error('custom splits not implemented yet');
+    // }
 
     const costPerPerson = Math.round(amount / splitGroup.length);
 
     // TODO: calculate how much each person owed for this transaction
-    splitGroup.forEach(({ person: { personId } }) => {
+    splitGroup.forEach(({ id: personId }) => {
       const prevLiableAmount = totalLiable[personId] || 0;
 
       totalLiable[personId] = prevLiableAmount + costPerPerson;
@@ -111,21 +84,18 @@ export function TripDetails ({ tripId }: TripDetailsProps) {
   });
 
   const netOwedByPerson = attendingList
-    .map((invitee) => {
-      const person = invitee.person;
-
+    .map((person) => {
       if (!person) {
         // TODO: handle this better?
         throw new Error('Person not found!');
       }
 
-      const netOwed =
-        (spent[person.personId] || 0) - totalLiable[person.personId];
+      const netOwed = (spent[person.id] || 0) - totalLiable[person.id];
 
       return {
-        id: person.personId,
+        id: person.id,
         name: person.firstName,
-        amountOwed: netOwed
+        amountOwed: netOwed,
       };
     })
     .sort((a, b) => a.amountOwed - b.amountOwed);
@@ -133,6 +103,50 @@ export function TripDetails ({ tripId }: TripDetailsProps) {
   return (
     <>
       <h2>{trip.name}</h2>
+      <TripForm
+        defaultValue={trip}
+        onSubmit={(trip) => {
+          updateTrip(trip, {
+            onSuccess: () => {
+              alert('Success!');
+            },
+            onError: () => {
+              alert('Failure!');
+            },
+          });
+        }}
+      />
+      <h3>Attendees</h3>
+      <AttendeesList
+        attendees={trip.attendees}
+        onDelete={(attendeeId) => {
+          removeAttendeeFromTrip({ tripId, attendeeId });
+        }}
+        onAddAttendee={(personId) => {
+          addAttendeeToTrip({ tripId, personId });
+        }}
+      />
+      <button
+        onClick={() => {
+          setShowAddAttendeeDialog(true);
+        }}
+      >
+        Add Attendee
+      </button>
+
+      <h3>Transactions</h3>
+
+      <TransactionList
+        transactions={trip.expenses}
+        onAddTransaction={(newTransaction) =>
+          addTransaction({ tripId, transaction: newTransaction })
+        }
+        onRemoveTransaction={(transactionId) => {
+          removeTransaction({ tripId, transactionId });
+        }}
+      />
+
+      <h3>Net Owed</h3>
       {/* TODO: this should probably be a <table> element */}
       <div
       // sx={{
@@ -152,6 +166,23 @@ export function TripDetails ({ tripId }: TripDetailsProps) {
           );
         })}
       </div>
+      <AddAttendeeDialog
+        open={showAddAttendeeDialog}
+        onClose={() => {
+          setShowAddAttendeeDialog(false);
+        }}
+        idsToExclude={trip.attendees.map(({ id }) => id)}
+        onAddAttendee={(attendeeId) => {
+          addAttendeeToTrip(
+            { tripId, attendeeId },
+            {
+              onSuccess: () => {
+                setShowAddAttendeeDialog(false);
+              },
+            },
+          );
+        }}
+      />
     </>
   );
 }

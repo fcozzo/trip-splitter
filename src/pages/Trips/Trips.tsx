@@ -1,7 +1,8 @@
 import styles from './Trips.module.css';
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { Card } from '../../libs/ui/Card.tsx';
+import Card from '../../components/Card/Card.tsx';
+import CardList from '../../components/CardList/CardList.tsx';
 import { CreateTripDialog } from '../CreateTripDialog';
 
 import { useFetchTrips, useDeleteTrip } from './helpers.ts';
@@ -40,16 +41,17 @@ export function Trips() {
       <div className={styles.trips}>
         <h2>Trips</h2>
         <button onClick={handleNewTripClick}>New Trip</button>
-        <ul className={styles.tripList}>
+
+        <CardList>
           {trips?.map(({ id, name }) => (
-            <li key={id} className={styles.tripListItem}>
+            <CardList.Item key={id}>
               <Card asChild key={id}>
                 <Link to={getTripUrl(id)}>{name}</Link>
               </Card>
               <button onClick={handleDelete(id)}>delete</button>
-            </li>
+            </CardList.Item>
           ))}
-        </ul>
+        </CardList>
       </div>
       <CreateTripDialog
         open={showCreateDialog}

@@ -11,7 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TripsIndexRouteImport } from './routes/trips/index'
+import { Route as PeopleIndexRouteImport } from './routes/people/index'
 import { Route as TripsTripIdRouteImport } from './routes/trips/$tripId'
+import { Route as PeopleCreateRouteImport } from './routes/people/create'
+import { Route as PeoplePersonIdRouteImport } from './routes/people/$personId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,39 +26,85 @@ const TripsIndexRoute = TripsIndexRouteImport.update({
   path: '/trips/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PeopleIndexRoute = PeopleIndexRouteImport.update({
+  id: '/people/',
+  path: '/people/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TripsTripIdRoute = TripsTripIdRouteImport.update({
   id: '/trips/$tripId',
   path: '/trips/$tripId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PeopleCreateRoute = PeopleCreateRouteImport.update({
+  id: '/people/create',
+  path: '/people/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PeoplePersonIdRoute = PeoplePersonIdRouteImport.update({
+  id: '/people/$personId',
+  path: '/people/$personId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/people/$personId': typeof PeoplePersonIdRoute
+  '/people/create': typeof PeopleCreateRoute
   '/trips/$tripId': typeof TripsTripIdRoute
+  '/people/': typeof PeopleIndexRoute
   '/trips/': typeof TripsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/people/$personId': typeof PeoplePersonIdRoute
+  '/people/create': typeof PeopleCreateRoute
   '/trips/$tripId': typeof TripsTripIdRoute
+  '/people': typeof PeopleIndexRoute
   '/trips': typeof TripsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/people/$personId': typeof PeoplePersonIdRoute
+  '/people/create': typeof PeopleCreateRoute
   '/trips/$tripId': typeof TripsTripIdRoute
+  '/people/': typeof PeopleIndexRoute
   '/trips/': typeof TripsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/trips/$tripId' | '/trips/'
+  fullPaths:
+    | '/'
+    | '/people/$personId'
+    | '/people/create'
+    | '/trips/$tripId'
+    | '/people/'
+    | '/trips/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/trips/$tripId' | '/trips'
-  id: '__root__' | '/' | '/trips/$tripId' | '/trips/'
+  to:
+    | '/'
+    | '/people/$personId'
+    | '/people/create'
+    | '/trips/$tripId'
+    | '/people'
+    | '/trips'
+  id:
+    | '__root__'
+    | '/'
+    | '/people/$personId'
+    | '/people/create'
+    | '/trips/$tripId'
+    | '/people/'
+    | '/trips/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PeoplePersonIdRoute: typeof PeoplePersonIdRoute
+  PeopleCreateRoute: typeof PeopleCreateRoute
   TripsTripIdRoute: typeof TripsTripIdRoute
+  PeopleIndexRoute: typeof PeopleIndexRoute
   TripsIndexRoute: typeof TripsIndexRoute
 }
 
@@ -75,6 +124,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TripsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/people/': {
+      id: '/people/'
+      path: '/people'
+      fullPath: '/people/'
+      preLoaderRoute: typeof PeopleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trips/$tripId': {
       id: '/trips/$tripId'
       path: '/trips/$tripId'
@@ -82,12 +138,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TripsTripIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/people/create': {
+      id: '/people/create'
+      path: '/people/create'
+      fullPath: '/people/create'
+      preLoaderRoute: typeof PeopleCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/people/$personId': {
+      id: '/people/$personId'
+      path: '/people/$personId'
+      fullPath: '/people/$personId'
+      preLoaderRoute: typeof PeoplePersonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PeoplePersonIdRoute: PeoplePersonIdRoute,
+  PeopleCreateRoute: PeopleCreateRoute,
   TripsTripIdRoute: TripsTripIdRoute,
+  PeopleIndexRoute: PeopleIndexRoute,
   TripsIndexRoute: TripsIndexRoute,
 }
 export const routeTree = rootRouteImport

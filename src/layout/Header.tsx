@@ -1,9 +1,10 @@
-import './Header.css';
+import { Link } from '@tanstack/react-router';
+import styles from './Header.module.css';
 
-export function Header () {
+export function Header() {
   return (
-    <header className="header">
-      <div>HEADER FOP</div>
+    <header className={styles.header}>
+      <Link to="/">Home</Link>
     </header>
   );
 }

@@ -1,3 +1,4 @@
+import React from 'react';
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { Header } from '../layout/Header.tsx';
@@ -13,5 +14,5 @@ export const Route = createRootRoute({
       <Footer />
       <TanStackRouterDevtools />
     </>
-  )
+  ),
 });
