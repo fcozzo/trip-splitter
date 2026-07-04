@@ -1,12 +1,5 @@
 import { useCallback, useState } from 'react';
-import {
-  Dialog,
-  Content,
-  Overlay,
-  Title,
-  Description,
-  Close,
-} from '@radix-ui/react-dialog';
+import { Dialog } from '@radix-ui';
 import styles from './AddAttendeeDialog.module.css';
 import { useFetchPeople } from '../../../People/helpers.ts';
 
@@ -33,37 +26,22 @@ export function AddAttendeeDialog({
       onAddAttendee(attendee);
 
       setAttendee('');
-
-      // createTrip(
-      //   { name: tripName },
-      //   {
-      //     onSuccess: () => {
-      //       alert('Successfully added attendee');
-      //     },
-      //     onError: (e) => {
-      //       alert(`Error adding attendee\n\n${e.toString()}`);
-      //     },
-      //     onSettled: () => {
-      //       onClose();
-      //     },
-      //   },
-      // );
     },
     [attendee, onAddAttendee],
   );
 
   return (
-    <Dialog
+    <Dialog.Root
       open={open}
       onOpenChange={(newOpen) => {
         if (!newOpen) onClose();
       }}
     >
-      <Overlay className={styles.overlay}>
-        <Content className={styles.content}>
+      <Dialog.Overlay className={styles.overlay}>
+        <Dialog.Content className={styles.content}>
           <form onSubmit={handleSubmit}>
-            <Title>Add an Attendee</Title>
-            <Description>
+            <Dialog.Title>Add an Attendee</Dialog.Title>
+            <Dialog.Description>
               <select
                 name="tripName"
                 type="text"
@@ -82,12 +60,12 @@ export function AddAttendeeDialog({
                     </option>
                   ))}
               </select>
-            </Description>
-            <Close onClick={onClose}>Close</Close>
+            </Dialog.Description>
+            <Dialog.Close onClick={onClose}>Close</Dialog.Close>
             <button type="submit">Add</button>
           </form>
-        </Content>
-      </Overlay>
-    </Dialog>
+        </Dialog.Content>
+      </Dialog.Overlay>
+    </Dialog.Root>
   );
 }
