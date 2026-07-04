@@ -1,19 +1,14 @@
 import { styles } from './TripDetails.module.css';
 import { useState } from 'react';
+import { Link } from '@tanstack/react-router';
 
 import type { Expense, Settle, Trip } from '../../types';
 import { PersonOwed } from './components/PersonOwed.tsx';
 import {
   useFetchTrip,
-  useUpdateTrip,
-  useRemoveAttendeeFromTrip,
-  useAddAttendee,
   useAddTransaction,
   useRemoveTransaction,
 } from './helpers.ts';
-import { TripForm } from './components/TripForm.tsx';
-import { AttendeesList } from './components/AttendeesList/AttendeesList.tsx';
-import { AddAttendeeDialog } from './components/AddAttendeeDialog/AddAttendeeDialog.tsx';
 import { TransactionList } from './components/TransactionList';
 
 const USDollar = new Intl.NumberFormat('en-US', {
@@ -33,11 +28,7 @@ type TripDetailsProps = {
 export function TripDetails({ tripId }: TripDetailsProps) {
   // TODO: move the fetch functionality into the hardcoded service
   const [settles, setSettles] = useState<Settle[]>([]);
-  const [showAddAttendeeDialog, setShowAddAttendeeDialog] = useState(false);
   const { data: trip, isLoading } = useFetchTrip(tripId);
-  const { mutate: updateTrip } = useUpdateTrip();
-  const { mutate: removeAttendeeFromTrip } = useRemoveAttendeeFromTrip();
-  const { mutate: addAttendeeToTrip } = useAddAttendee();
   const { mutate: addTransaction } = useAddTransaction();
   const { mutate: removeTransaction } = useRemoveTransaction();
 
@@ -102,37 +93,12 @@ export function TripDetails({ tripId }: TripDetailsProps) {
 
   return (
     <>
-      <h2>{trip.name}</h2>
-      <TripForm
-        defaultValue={trip}
-        onSubmit={(trip) => {
-          updateTrip(trip, {
-            onSuccess: () => {
-              alert('Success!');
-            },
-            onError: () => {
-              alert('Failure!');
-            },
-          });
-        }}
-      />
-      <h3>Attendees</h3>
-      <AttendeesList
-        attendees={trip.attendees}
-        onDelete={(attendeeId) => {
-          removeAttendeeFromTrip({ tripId, attendeeId });
-        }}
-        onAddAttendee={(personId) => {
-          addAttendeeToTrip({ tripId, personId });
-        }}
-      />
-      <button
-        onClick={() => {
-          setShowAddAttendeeDialog(true);
-        }}
-      >
-        Add Attendee
-      </button>
+      <h2>
+        {trip.name}{' '}
+        <Link to="/trips/$tripId/edit" params={{ tripId }}>
+          Edit
+        </Link>
+      </h2>
 
       <h3>Transactions</h3>
 
@@ -166,23 +132,6 @@ export function TripDetails({ tripId }: TripDetailsProps) {
           );
         })}
       </div>
-      <AddAttendeeDialog
-        open={showAddAttendeeDialog}
-        onClose={() => {
-          setShowAddAttendeeDialog(false);
-        }}
-        idsToExclude={trip.attendees.map(({ id }) => id)}
-        onAddAttendee={(attendeeId) => {
-          addAttendeeToTrip(
-            { tripId, attendeeId },
-            {
-              onSuccess: () => {
-                setShowAddAttendeeDialog(false);
-              },
-            },
-          );
-        }}
-      />
     </>
   );
 }

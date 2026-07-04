@@ -15,6 +15,7 @@ import { Route as PeopleIndexRouteImport } from './routes/people/index'
 import { Route as TripsTripIdRouteImport } from './routes/trips/$tripId'
 import { Route as PeopleCreateRouteImport } from './routes/people/create'
 import { Route as PeoplePersonIdRouteImport } from './routes/people/$personId'
+import { Route as TripsTripIdEditRouteImport } from './routes/trips/$tripId_.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const PeoplePersonIdRoute = PeoplePersonIdRouteImport.update({
   path: '/people/$personId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TripsTripIdEditRoute = TripsTripIdEditRouteImport.update({
+  id: '/trips/$tripId_/edit',
+  path: '/trips/$tripId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/trips/$tripId': typeof TripsTripIdRoute
   '/people/': typeof PeopleIndexRoute
   '/trips/': typeof TripsIndexRoute
+  '/trips/$tripId/edit': typeof TripsTripIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/trips/$tripId': typeof TripsTripIdRoute
   '/people': typeof PeopleIndexRoute
   '/trips': typeof TripsIndexRoute
+  '/trips/$tripId/edit': typeof TripsTripIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/trips/$tripId': typeof TripsTripIdRoute
   '/people/': typeof PeopleIndexRoute
   '/trips/': typeof TripsIndexRoute
+  '/trips/$tripId_/edit': typeof TripsTripIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/trips/$tripId'
     | '/people/'
     | '/trips/'
+    | '/trips/$tripId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/trips/$tripId'
     | '/people'
     | '/trips'
+    | '/trips/$tripId/edit'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/trips/$tripId'
     | '/people/'
     | '/trips/'
+    | '/trips/$tripId_/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +118,7 @@ export interface RootRouteChildren {
   TripsTripIdRoute: typeof TripsTripIdRoute
   PeopleIndexRoute: typeof PeopleIndexRoute
   TripsIndexRoute: typeof TripsIndexRoute
+  TripsTripIdEditRoute: typeof TripsTripIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PeoplePersonIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/trips/$tripId_/edit': {
+      id: '/trips/$tripId_/edit'
+      path: '/trips/$tripId/edit'
+      fullPath: '/trips/$tripId/edit'
+      preLoaderRoute: typeof TripsTripIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   TripsTripIdRoute: TripsTripIdRoute,
   PeopleIndexRoute: PeopleIndexRoute,
   TripsIndexRoute: TripsIndexRoute,
+  TripsTripIdEditRoute: TripsTripIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
