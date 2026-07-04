@@ -81,7 +81,7 @@ export function TripDetails({ tripId }: TripDetailsProps) {
         throw new Error('Person not found!');
       }
 
-      const netOwed = (spent[person.id] || 0) - totalLiable[person.id];
+      const netOwed = (spent[person.id] || 0) - (totalLiable[person.id] || 0);
 
       return {
         id: person.id,
