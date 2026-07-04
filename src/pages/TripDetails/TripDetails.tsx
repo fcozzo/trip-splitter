@@ -1,6 +1,7 @@
 import { styles } from './TripDetails.module.css';
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
+import { Tabs } from 'radix-ui';
 
 import type { Expense, Settle, Trip } from '../../types';
 import { PersonOwed } from './components/PersonOwed.tsx';
@@ -100,38 +101,48 @@ export function TripDetails({ tripId }: TripDetailsProps) {
         </Link>
       </h2>
 
-      <h3>Transactions</h3>
-
-      <TransactionList
-        transactions={trip.expenses}
-        onAddTransaction={(newTransaction) =>
-          addTransaction({ tripId, transaction: newTransaction })
-        }
-        onRemoveTransaction={(transactionId) => {
-          removeTransaction({ tripId, transactionId });
-        }}
-      />
-
-      <h3>Net Owed</h3>
-      {/* TODO: this should probably be a <table> element */}
-      <div
-      // sx={{
-      //   display: "flex",
-      //   flexDirection: "column",
-      //   maxWidth: "360px",
-      //   gap: "8px",
-      // }}
-      >
-        {netOwedByPerson.map(({ id, name, amountOwed }) => {
-          return (
-            <PersonOwed
-              key={id}
-              name={name}
-              amountOwed={centsToDollarsFmt(amountOwed)}
-            />
-          );
-        })}
-      </div>
+      <Tabs.Root defaultValue="tab1" orientation="vertical">
+        <Tabs.List aria-label="trip views">
+          <Tabs.Trigger value="transactions">
+            <h3>Transactions</h3>
+          </Tabs.Trigger>
+          <Tabs.Trigger value="netOwed">
+            <h3>Net Owed</h3>
+          </Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="transactions">
+          <TransactionList
+            transactions={trip.expenses}
+            onAddTransaction={(newTransaction) =>
+              addTransaction({ tripId, transaction: newTransaction })
+            }
+            onRemoveTransaction={(transactionId) => {
+              removeTransaction({ tripId, transactionId });
+            }}
+          />
+        </Tabs.Content>
+        <Tabs.Content value="netOwed">
+          {/* TODO: this should probably be a <table> element */}
+          <div
+          // sx={{
+          //   display: "flex",
+          //   flexDirection: "column",
+          //   maxWidth: "360px",
+          //   gap: "8px",
+          // }}
+          >
+            {netOwedByPerson.map(({ id, name, amountOwed }) => {
+              return (
+                <PersonOwed
+                  key={id}
+                  name={name}
+                  amountOwed={centsToDollarsFmt(amountOwed)}
+                />
+              );
+            })}
+          </div>
+        </Tabs.Content>
+      </Tabs.Root>
     </>
   );
 }
